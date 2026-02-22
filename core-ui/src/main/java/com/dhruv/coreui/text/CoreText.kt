@@ -5,11 +5,11 @@
 
 package com.dhruv.coreui.text
 
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnit.Companion.Unspecified
+import com.dhruv.coreui.theme.CoreTheme
 import com.dhruv.coreui.typography.CoreTypography
 
 @Composable
@@ -24,7 +25,7 @@ fun CoreText(
     text: String,
     type: CoreTextType,
     modifier: Modifier = Modifier,
-    color: Color = LocalContentColor.current,
+    color: Color = CoreTheme.colors.onBackground,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null,
     overflow: TextOverflow = TextOverflow.Clip,
@@ -32,7 +33,8 @@ fun CoreText(
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
     letterSpacing: TextUnit = Unspecified,
-    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+    isHtml: Boolean = false,
+    onTextLayout: ((TextLayoutResult) -> Unit) = {},
 ) {
 
     val style: TextStyle = when (type) {
@@ -46,9 +48,14 @@ fun CoreText(
         CoreTextType.LabelMedium -> CoreTypography.LabelMedium
         CoreTextType.LabelSmall -> CoreTypography.LabelSmall
     }
+    val finalText = if (isHtml) {
+        parseHtmlText(text)
+    } else {
+        AnnotatedString(text)
+    }
 
     Text(
-        text = text,
+        text = finalText,
         modifier = modifier,
         style = style.copy(
             color = color,
